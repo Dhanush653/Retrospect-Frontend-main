@@ -66,6 +66,14 @@ userJoinRoom(data){
   return axios.post("http://localhost:8080/userJoinRoom", data);
 }
 
+addNewTopic(topicDetails) {
+  return axios.post("http://localhost:8080/topic/addTopic", topicDetails);
+}
+
+getTopicsByRoomId(roomId) {
+  return axios.get(`http://localhost:8080/topic/room/${roomId}`);
+}
+
 }
 
 const retro = new RetrospectService();
