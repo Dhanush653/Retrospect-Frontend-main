@@ -131,6 +131,7 @@ function ChatRoom() {
   });
   const [dialogOpen, setDialogOpen] = useState(false); 
   const [additionalSections, setAdditionalSections] = useState([]); 
+  const [dynamicMessages, setDynamicMessages] = useState({}); // For storing messages of dynamic sections
   const [addTopicDialogOpen, setAddTopicDialogOpen] = useState(false); 
 
   const socketRef = useRef(null);
@@ -160,6 +161,10 @@ function ChatRoom() {
             setBlunderMessages(prev => [...prev, data]);
             break;
           default:
+            setDynamicMessages(prev => ({
+              ...prev,
+              [data.contentType]: [...(prev[data.contentType] || []), data]
+            }));
             break;
         }
       });
@@ -199,33 +204,33 @@ function ChatRoom() {
       }
       const messages = await response.json();
 
-      const good = [];
-      const bad = [];
-      const pos = [];
-      const blunder = [];
+      const messageMap = {
+        'Good': [],
+        'Bad': [],
+        'Pos': [],
+        'Blunder': []
+      };
+
       messages.forEach(msg => {
-        switch (msg.contentType) {
-          case 'Good':
-            good.push(msg);
-            break;
-          case 'Bad':
-            bad.push(msg);
-            break;
-          case 'Pos':
-            pos.push(msg);
-            break;
-          case 'Blunder':
-            blunder.push(msg);
-            break;
-          default:
-            break;
+        if (msg.contentType in messageMap) {
+          messageMap[msg.contentType].push(msg);
+        } else {
+          if (!messageMap[msg.contentType]) {
+            messageMap[msg.contentType] = [];
+          }
+          messageMap[msg.contentType].push(msg);
         }
       });
 
-      setGoodMessages(good);
-      setBadMessages(bad);
-      setPosMessages(pos);
-      setBlunderMessages(blunder);
+      setGoodMessages(messageMap['Good']);
+      setBadMessages(messageMap['Bad']);
+      setPosMessages(messageMap['Pos']);
+      setBlunderMessages(messageMap['Blunder']);
+      delete messageMap['Good'];
+      delete messageMap['Bad'];
+      delete messageMap['Pos'];
+      delete messageMap['Blunder'];
+      setDynamicMessages(messageMap);
     } catch (error) {
       console.error("Failed to fetch messages:", error);
     }
@@ -263,6 +268,13 @@ function ChatRoom() {
     setBadMessages(prev => prev.filter(msg => msg.id !== messageId));
     setPosMessages(prev => prev.filter(msg => msg.id !== messageId));
     setBlunderMessages(prev => prev.filter(msg => msg.id !== messageId));
+    setDynamicMessages(prev => {
+      const newDynamicMessages = { ...prev };
+      Object.keys(newDynamicMessages).forEach(key => {
+        newDynamicMessages[key] = newDynamicMessages[key].filter(msg => msg.id !== messageId);
+      });
+      return newDynamicMessages;
+    });
   };
 
   const handleClickOpen = () => {
@@ -383,17 +395,17 @@ function ChatRoom() {
             onSendMessage={() => handleSendMessage('Blunder')}
             onDeleteMessage={handleDeleteMessage}
           />
-          {additionalSections.map((section, index) => (
-            <MessageSection
-              key={index}
-              title={section}
-              messages={[]}
-              inputValue={messageInputs[section] || ''}
-              onInputChange={(value) => handleInputChange(value, section)}
-              onSendMessage={() => handleSendMessage(section)}
-              onDeleteMessage={handleDeleteMessage}
-            />
-          ))}
+ {additionalSections.map((section, index) => (
+  <MessageSection
+    key={index}
+    title={section}
+    messages={dynamicMessages[section] || []}
+    inputValue={messageInputs[section] || ''}
+    onInputChange={(value) => handleInputChange(value, section)}
+    onSendMessage={() => handleSendMessage(section)}
+    onDeleteMessage={handleDeleteMessage}
+  />
+))}
         </div>
       </div>
       <UsernamesDialog roomId={roomId} open={dialogOpen} onClose={handleDialogClose} />
