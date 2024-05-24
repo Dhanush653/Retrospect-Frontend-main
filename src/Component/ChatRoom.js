@@ -395,17 +395,17 @@ function ChatRoom() {
             onSendMessage={() => handleSendMessage('Blunder')}
             onDeleteMessage={handleDeleteMessage}
           />
- {additionalSections.map((section, index) => (
-  <MessageSection
-    key={index}
-    title={section}
-    messages={dynamicMessages[section] || []}
-    inputValue={messageInputs[section] || ''}
-    onInputChange={(value) => handleInputChange(value, section)}
-    onSendMessage={() => handleSendMessage(section)}
-    onDeleteMessage={handleDeleteMessage}
-  />
-))}
+          {additionalSections.map((section, index) => (
+          <MessageSection
+          key={index}
+          title={section}
+          messages={dynamicMessages[section] || []}
+          inputValue={messageInputs[section] || ''}
+          onInputChange={(value) => handleInputChange(value, section)}
+          onSendMessage={() => handleSendMessage(section)}
+          onDeleteMessage={handleDeleteMessage}
+        />
+        ))}
         </div>
       </div>
       <UsernamesDialog roomId={roomId} open={dialogOpen} onClose={handleDialogClose} />
