@@ -45,9 +45,8 @@ class RetrospectService {
 changePassword(change) {
     return axios.post("http://localhost:8080/change", change);
 }
-
-checkRoomAccessByEmail(data) {
-  return axios.post("http://localhost:8080/rooms/check-access", data);
+checkRoomAccessByPassword(data) {
+  return axios.post("http://localhost:8080/access", data);
 }
 
 getRoomById(roomId) {

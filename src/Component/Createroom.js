@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, FormControl, RadioGroup, Radio, FormControlLabel, IconButton, Box } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, FormControl, RadioGroup, Radio, FormControlLabel } from '@mui/material';
 import retro from '../Service/RetrospectService';
 
 const Createroom = ({ open, onClose, roomToUpdate }) => {
@@ -8,7 +7,7 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
     roomDescription: '',
     roomName: '',
     access: 'unrestricted',
-    allowedEmails: [],
+    password: '', 
     roomCreatedBy: ''
   });
 
@@ -25,7 +24,7 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
         roomDescription: '',
         roomName: '',
         access: 'unrestricted',
-        allowedEmails: [],
+        password: '', // Add password field
         roomCreatedBy: roomCreatedBy
       });
     }
@@ -37,20 +36,7 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
   };
 
   const handleAccessChange = (e) => {
-    setRoomDetails({ ...roomDetails, access: e.target.value, allowedEmails: [] });
-  };
-
-  const handleAddEmail = () => {
-    setRoomDetails({
-      ...roomDetails,
-      allowedEmails: [...roomDetails.allowedEmails, '']
-    });
-  };
-
-  const handleEmailChange = (index, value) => {
-    const newEmails = [...roomDetails.allowedEmails];
-    newEmails[index] = value;
-    setRoomDetails({ ...roomDetails, allowedEmails: newEmails });
+    setRoomDetails({ ...roomDetails, access: e.target.value, password: '' });
   };
 
   const handleSubmit = async () => {
@@ -98,22 +84,15 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
               </RadioGroup>
             </FormControl>
             {roomDetails.access === 'restricted' && (
-              <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-                {roomDetails.allowedEmails.map((email, index) => (
-                  <TextField
-                    key={index}
-                    value={email}
-                    onChange={(e) => handleEmailChange(index, e.target.value)}
-                    variant="outlined"
-                    fullWidth
-                    label={`Email ${index + 1}`}
-                    sx={{ marginRight: '5px' }}
-                  />
-                ))}
-                <IconButton onClick={handleAddEmail} color="primary" aria-label="add email">
-                  <Add />
-                </IconButton>
-              </Box>
+              <TextField
+                name="password"
+                label="Password"
+                value={roomDetails.password}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                sx={{ marginTop: '10px' }}
+              />
             )}
           </React.Fragment>
         )}

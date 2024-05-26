@@ -6,12 +6,12 @@ import Createroom from './Createroom';
 import LockPersonIcon from '@mui/icons-material/LockPerson';
 import OptionsImage from '../Asserts/options.png';
 
+
 const Dashboard = () => {
     const [rooms, setRooms] = useState([]);
     const userId = localStorage.getItem('userId');
     const [reloadDashboard, setReloadDashboard] = useState(false);
     const [roomToUpdate, setRoomToUpdate] = useState(null);
-    const userEmail = localStorage.getItem('userEmail');
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedRoom, setSelectedRoom] = useState(null);
@@ -31,31 +31,26 @@ const Dashboard = () => {
         fetchRooms();
     }, [reloadDashboard]);
 
-    const openRoom = async (rId, access, uId) => {
-        const res = await retrospectService.userJoinRoom({
-            roomId: rId,
-            userId: uId,
-        });
+    const openRoom = async (roomId, access, userId) => {
         if (access === 'restricted') {
-            try {
-                if (userEmail) {
-                    const requestData = { email: userEmail, roomId: rId };
-                    const response = await retrospectService.checkRoomAccessByEmail(requestData);
-                    if (response.data === 'access approved') {
-                        window.location.href = `/chatroom/${rId}`;
-                        return;
+            const password = prompt('Enter password:');
+            if (password) {
+                try {
+                    const response = await retrospectService.checkRoomAccessByPassword({ roomId, password });
+                    if (response.data === 'Access approved') {
+                        window.location.href = `/chatroom/${roomId}`;
+                    } else {
+                        alert('Wrong password!');
                     }
-                } else {
-                    alert('User email not available.');
+                } catch (error) {
+                    console.error('Error checking access:', error);
                 }
-            } catch (error) {
-                console.error('Error checking access:', error);
             }
-            alert("You don't have access to this room");
         } else {
-            window.location.href = `/chatroom/${rId}`;
+            window.location.href = `/chatroom/${roomId}`;
         }
     };
+    
 
     const handleCreateRoomSuccess = async () => {
         setRoomToUpdate(null);
