@@ -74,6 +74,10 @@ getTopicsByRoomId(roomId) {
   return axios.get(`http://localhost:8080/topic/room/${roomId}`);
 }
 
+deleteRoom(roomId){
+  return axios.delete(`http://localhost:8080/deleteroom/${roomId}`);
+}
+
 }
 
 const retro = new RetrospectService();

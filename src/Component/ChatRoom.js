@@ -17,7 +17,9 @@ import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import OptionsMenu from './OptionsMenu';
 import UsernamesDialog from './UsernamesDialog';
 import AddIcon from '@mui/icons-material/Add';
-import AddTopicDialog from './AddTopicDialog'; 
+import AddTopicDialog from './AddTopicDialog';
+import Button from '@mui/material/Button';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -28,7 +30,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSendMessage, onDeleteMessage }) => {
+const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSendMessage, onDeleteMessage, color }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedMessageId, setSelectedMessageId] = useState(null);
   const [showInput, setShowInput] = useState(false);
@@ -48,7 +50,7 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
       if (selectedMessageId) {
         await RetrospectService.deleteMessageById(selectedMessageId);
         console.log('Message deleted successfully');
-        onDeleteMessage(selectedMessageId); 
+        onDeleteMessage(selectedMessageId);
         handleOptionsClose();
       }
     } catch (error) {
@@ -57,12 +59,12 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
   };
 
   const toggleInputArea = () => {
-    setShowInput(prev => !prev); 
+    setShowInput(prev => !prev);
   };
 
   return (
     <div className="message-section">
-      <button className={`title-button ${getClassName(title)}`} onClick={toggleInputArea}>
+      <button className="title-button" onClick={toggleInputArea}>
         {title}
       </button>
       {showInput && (
@@ -79,7 +81,7 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
       )}
       <div className="messages">
         {messages.map((msg, index) => (
-          <div key={index} className={`message-container ${getClassName(msg.contentType)}`}>
+          <div key={index} className="message-container" style={{ backgroundColor: color }}>
             <p className="message-text">
               {msg.username}: {msg.content}
             </p>
@@ -114,6 +116,15 @@ function getClassName(contentType) {
   }
 }
 
+function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
 function ChatRoom() {
   const { roomId } = useParams();
   const username = localStorage.getItem('userEmail');
@@ -129,16 +140,17 @@ function ChatRoom() {
     Pos: '',
     Blunder: ''
   });
-  const [dialogOpen, setDialogOpen] = useState(false); 
-  const [additionalSections, setAdditionalSections] = useState([]); 
-  const [dynamicMessages, setDynamicMessages] = useState({}); // For storing messages of dynamic sections
-  const [addTopicDialogOpen, setAddTopicDialogOpen] = useState(false); 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [additionalSections, setAdditionalSections] = useState([]);
+  const [dynamicMessages, setDynamicMessages] = useState({});
+  const [sectionColors, setSectionColors] = useState({});
+  const [addTopicDialogOpen, setAddTopicDialogOpen] = useState(false);
 
   const socketRef = useRef(null);
 
   useEffect(() => {
     if (!socketRef.current) {
-      const socketUrl = `http://192.168.0.22:8085?room=${roomId}&username=${username}`;
+      const socketUrl = `http://192.168.29.204:8085?room=${roomId}&username=${username}`;
       socketRef.current = io(socketUrl, { transports: ['websocket'], upgrade: false });
 
       socketRef.current.on('connect', () => {
@@ -239,8 +251,20 @@ function ChatRoom() {
   const fetchTopics = async () => {
     try {
       const response = await RetrospectService.getTopicsByRoomId(roomId);
-      setAdditionalSections(response.data.map(topic => topic.topicName));
-      console.log(response);
+      const newTopics = response.data.map(topic => topic.topicName);
+      setAdditionalSections(newTopics);
+
+      const existingColors = JSON.parse(localStorage.getItem('sectionColors') || '{}');
+      const newColors = {};
+      newTopics.forEach(topic => {
+        if (!existingColors[topic]) {
+          existingColors[topic] = getRandomColor();
+        }
+        newColors[topic] = existingColors[topic];
+      });
+
+      setSectionColors(newColors);
+      localStorage.setItem('sectionColors', JSON.stringify(newColors));
     } catch (error) {
       console.error('Error fetching topics:', error);
     }
@@ -311,6 +335,14 @@ function ChatRoom() {
         const response = await RetrospectService.addNewTopic(topicDetails);
         if (response.data) {
           setAdditionalSections(prev => [...prev, newTopic]);
+          const newColor = getRandomColor();
+          setSectionColors(prev => ({ ...prev, [newTopic]: newColor }));
+          localStorage.setItem('sectionColors', JSON.stringify({ ...sectionColors, [newTopic]: newColor }));
+          setDynamicMessages(prev => ({
+            ...prev,
+            [newTopic]: []
+          }));
+          setMessageInputs(prev => ({ ...prev, [newTopic]: '' }));
         } else {
           console.error('Error: Topic was not added correctly');
         }
@@ -331,6 +363,13 @@ function ChatRoom() {
         <p className='roomname'>{room.roomName}</p>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginRight: '2%' }}>
+        <Button
+        sx={{ backgroundColor: '#ff0000', color: 'white',fontWeight:'bold',fontSize:'12px', '&:hover': { backgroundColor: '#ff0000' } }}
+        onClick={() => window.location.href = 'http://localhost:3000'}
+        >
+          Exit Room <LogoutIcon sx={{width:'18%', marginLeft:'2%'}}/>
+        </Button>
+
           <IconButton onClick={handleAddTopicDialogOpen}>
             <AddIcon sx={{ color: 'black' }} />
           </IconButton>
@@ -370,6 +409,7 @@ function ChatRoom() {
             onInputChange={(value) => handleInputChange(value, 'Good')}
             onSendMessage={() => handleSendMessage('Good')}
             onDeleteMessage={handleDeleteMessage}
+            color="#68d391"
           />
           <MessageSection
             title="WHAT WENT WRONG"
@@ -378,6 +418,7 @@ function ChatRoom() {
             onInputChange={(value) => handleInputChange(value, 'Bad')}
             onSendMessage={() => handleSendMessage('Bad')}
             onDeleteMessage={handleDeleteMessage}
+            color="#fc8181"
           />
           <MessageSection
             title="POSITIVES"
@@ -386,6 +427,7 @@ function ChatRoom() {
             onInputChange={(value) => handleInputChange(value, 'Pos')}
             onSendMessage={() => handleSendMessage('Pos')}
             onDeleteMessage={handleDeleteMessage}
+            color="#f6e05e"
           />
           <MessageSection
             title="BLUNDERS"
@@ -394,18 +436,20 @@ function ChatRoom() {
             onInputChange={(value) => handleInputChange(value, 'Blunder')}
             onSendMessage={() => handleSendMessage('Blunder')}
             onDeleteMessage={handleDeleteMessage}
+            color="#f6ad55"
           />
           {additionalSections.map((section, index) => (
-          <MessageSection
-          key={index}
-          title={section}
-          messages={dynamicMessages[section] || []}
-          inputValue={messageInputs[section] || ''}
-          onInputChange={(value) => handleInputChange(value, section)}
-          onSendMessage={() => handleSendMessage(section)}
-          onDeleteMessage={handleDeleteMessage}
-        />
-        ))}
+            <MessageSection
+              key={index}
+              title={section}
+              messages={dynamicMessages[section] || []}
+              inputValue={messageInputs[section] || ''}
+              onInputChange={(value) => handleInputChange(value, section)}
+              onSendMessage={() => handleSendMessage(section)}
+              onDeleteMessage={handleDeleteMessage}
+              color={sectionColors[section]}
+            />
+          ))}
         </div>
       </div>
       <UsernamesDialog roomId={roomId} open={dialogOpen} onClose={handleDialogClose} />
