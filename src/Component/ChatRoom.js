@@ -62,6 +62,13 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
     setShowInput(prev => !prev);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // Prevent default action of adding a new line
+      onSendMessage();
+    }
+  };
+
   return (
     <div className="message-section">
       <button className="title-button" onClick={toggleInputArea}>
@@ -72,6 +79,7 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
           <textarea
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Type here.."
             className="textarea"
             rows="3"
@@ -100,6 +108,7 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
     </div>
   );
 });
+
 
 function getClassName(contentType) {
   switch (contentType) {
@@ -150,7 +159,7 @@ function ChatRoom() {
 
   useEffect(() => {
     if (!socketRef.current) {
-      const socketUrl = `http://192.168.29.204:8085?room=${roomId}&username=${username}`;
+      const socketUrl = `http://192.168.0.22:8085?room=${roomId}&username=${username}`;
       socketRef.current = io(socketUrl, { transports: ['websocket'], upgrade: false });
 
       socketRef.current.on('connect', () => {

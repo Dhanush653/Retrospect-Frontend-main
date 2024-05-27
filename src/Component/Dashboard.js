@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Header from './Header';
-import { Box, Typography, IconButton, Menu, MenuItem, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Box, Typography, IconButton, Menu, MenuItem, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import retrospectService from '../Service/RetrospectService';
 import Createroom from './Createroom';
 import LockPersonIcon from '@mui/icons-material/LockPerson';
 import OptionsImage from '../Asserts/options.png';
 
-
 const Dashboard = () => {
     const [rooms, setRooms] = useState([]);
+    const userEmail = localStorage.getItem('userEmail'); 
     const userId = localStorage.getItem('userId');
     const [reloadDashboard, setReloadDashboard] = useState(false);
     const [roomToUpdate, setRoomToUpdate] = useState(null);
@@ -18,6 +18,10 @@ const Dashboard = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+
+    const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+    const [password, setPassword] = useState('');
+    const [currentRoomId, setCurrentRoomId] = useState(null);
 
     useEffect(() => {
         const fetchRooms = async () => {
@@ -31,26 +35,39 @@ const Dashboard = () => {
         fetchRooms();
     }, [reloadDashboard]);
 
-    const openRoom = async (roomId, access, userId) => {
+    const openRoom = async (roomId, access) => {
+        const res = await retrospectService.userJoinRoom({
+            roomId: roomId,
+            userId: userId,
+        });
+        console.log(res);
         if (access === 'restricted') {
-            const password = prompt('Enter password:');
-            if (password) {
-                try {
-                    const response = await retrospectService.checkRoomAccessByPassword({ roomId, password });
-                    if (response.data === 'Access approved') {
-                        window.location.href = `/chatroom/${roomId}`;
-                    } else {
-                        alert('Wrong password!');
-                    }
-                } catch (error) {
-                    console.error('Error checking access:', error);
-                }
-            }
+            setCurrentRoomId(roomId);
+            setPasswordDialogOpen(true);
         } else {
             window.location.href = `/chatroom/${roomId}`;
         }
     };
-    
+
+    const handlePasswordSubmit = async () => {
+        try {
+            const response = await retrospectService.checkRoomAccessByPassword({ roomId: currentRoomId, password });
+            if (response.data === 'Access approved') {
+                window.location.href = `/chatroom/${currentRoomId}`;
+            } else {
+                alert('Wrong password!');
+            }
+        } catch (error) {
+            console.error('Error checking access:', error);
+        }
+        setPasswordDialogOpen(false);
+        setPassword('');
+    };
+
+    const handlePasswordDialogClose = () => {
+        setPasswordDialogOpen(false);
+        setPassword('');
+    };
 
     const handleCreateRoomSuccess = async () => {
         setRoomToUpdate(null);
@@ -119,14 +136,14 @@ const Dashboard = () => {
                         {room.access === 'restricted' && (
                             <LockPersonIcon style={{ position: 'absolute', top: 17, left: 'calc(100% - 27px)', marginTop: '-10px' }} />
                         )}
-                        <IconButton style={{ position: 'absolute', top: 0, left: 0 }} onClick={(event) => handleMenuOpen(event, room)}>
-                            <img src={OptionsImage} alt="Options" style={{ width: '24px', height: '24px' }} />
-                        </IconButton>
+                        {userEmail === room.roomCreatedBy && ( // Conditionally render IconButton
+                            <IconButton style={{ position: 'absolute', top: 0, left: 0 }} onClick={(event) => handleMenuOpen(event, room)}>
+                                <img src={OptionsImage} alt="Options" style={{ width: '24px', height: '24px' }} />
+                            </IconButton>
+                        )}
 
                         <div style={{ position: 'absolute', bottom: '10px', right: '6%', display: 'flex' }}>
-                            
-                                <Button variant="contained" onClick={() => openRoom(room.roomId, room.access, userId)} style={{ backgroundColor: '#0092ca', color: 'white', fontSize: '10px' }}>Enter Room</Button>
-                            
+                            <Button variant="contained" onClick={() => openRoom(room.roomId, room.access, userId)} style={{ backgroundColor: '#0092ca', color: 'white', fontSize: '10px' }}>Enter Room</Button>
                         </div>
                     </Box>
                 ))}
@@ -141,6 +158,25 @@ const Dashboard = () => {
                 <DialogActions>
                     <Button onClick={handleCancelDelete}>Cancel</Button>
                     <Button onClick={handleConfirmDelete} autoFocus>Delete</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={passwordDialogOpen} onClose={handlePasswordDialogClose}>
+                <DialogTitle>Enter Room Password</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Password"
+                        type="password"
+                        fullWidth
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handlePasswordDialogClose}>Cancel</Button>
+                    <Button onClick={handlePasswordSubmit} color="primary">Submit</Button>
                 </DialogActions>
             </Dialog>
         </div>
