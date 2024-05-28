@@ -34,6 +34,7 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedMessageId, setSelectedMessageId] = useState(null);
   const [showInput, setShowInput] = useState(false);
+  const userEmail = localStorage.getItem('userEmail');
 
   const handleOptionsClick = (event, messageId) => {
     setAnchorEl(event.currentTarget);
@@ -64,7 +65,7 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault(); // Prevent default action of adding a new line
+      e.preventDefault(); 
       onSendMessage();
     }
   };
@@ -93,6 +94,7 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
             <p className="message-text">
               {msg.username}: {msg.content}
             </p>
+            {userEmail ===msg.username &&(
             <img
               src="../Asserts/options.png"
               alt="options"
@@ -101,7 +103,8 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
               onClick={(event) => handleOptionsClick(event, msg.id)}
               style={{ cursor: 'pointer', marginTop: '0%' }}
             />
-            <OptionsMenu anchorEl={anchorEl} onClose={handleOptionsClose} onDelete={handleDelete} />
+          )}
+              <OptionsMenu anchorEl={anchorEl} onClose={handleOptionsClose} onDelete={handleDelete} />
           </div>
         ))}
       </div>
@@ -159,7 +162,7 @@ function ChatRoom() {
 
   useEffect(() => {
     if (!socketRef.current) {
-      const socketUrl = `http://192.168.0.22:8085?room=${roomId}&username=${username}`;
+      const socketUrl = `http://10.10.10.93:8085?room=${roomId}&username=${username}`;
       socketRef.current = io(socketUrl, { transports: ['websocket'], upgrade: false });
 
       socketRef.current.on('connect', () => {

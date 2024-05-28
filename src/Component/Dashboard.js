@@ -129,14 +129,14 @@ const Dashboard = () => {
                         <Typography variant="body2" style={{ position: 'absolute', textAlign: 'left', top: '27%', left: '10%', color: 'grey', maxWidth: '85%' }}>
                             {room.roomDescription}
                         </Typography>
-                        <Typography variant="subtitle2" gutterBottom style={{ position: 'absolute', top: '65%', left: '9%', color: 'black', fontSize: '12px', fontFamily: 'revert', fontWeight: 'bolder' }}>
+                        <Typography variant="subtitle2" gutterBottom style={{ position: 'absolute', top: '65%', left: '9%', color: 'black', fontSize: '70%', fontFamily: 'revert', fontWeight: 'bolder' }}>
                             Created By: {room.roomCreatedBy}
                         </Typography>
 
                         {room.access === 'restricted' && (
                             <LockPersonIcon style={{ position: 'absolute', top: 17, left: 'calc(100% - 27px)', marginTop: '-10px' }} />
                         )}
-                        {userEmail === room.roomCreatedBy && ( // Conditionally render IconButton
+                        {userEmail === room.roomCreatedBy && ( 
                             <IconButton style={{ position: 'absolute', top: 0, left: 0 }} onClick={(event) => handleMenuOpen(event, room)}>
                                 <img src={OptionsImage} alt="Options" style={{ width: '24px', height: '24px' }} />
                             </IconButton>

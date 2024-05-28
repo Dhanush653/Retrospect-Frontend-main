@@ -40,7 +40,7 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();  // Prevent form from submitting the default way
+    e.preventDefault(); 
     try {
       if (roomToUpdate) {
         await retro.updateRoom(roomToUpdate.roomId, roomDetails);
@@ -94,7 +94,7 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
               {roomDetails.access === 'restricted' && (
                 <TextField
                   name="password"
-                  label="Password"
+                  label="Set Room Password"
                   type='password'
                   value={roomDetails.password}
                   onChange={handleChange}
