@@ -20,6 +20,7 @@ import AddIcon from '@mui/icons-material/Add';
 import AddTopicDialog from './AddTopicDialog';
 import Button from '@mui/material/Button';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -35,7 +36,6 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
   const [selectedMessageId, setSelectedMessageId] = useState(null);
   const [showInput, setShowInput] = useState(false);
   const userEmail = localStorage.getItem('userEmail');
-
   const handleOptionsClick = (event, messageId) => {
     setAnchorEl(event.currentTarget);
     setSelectedMessageId(messageId);
@@ -65,10 +65,11 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault(); 
+      e.preventDefault();
       onSendMessage();
     }
   };
+
 
   return (
     <div className="message-section">
@@ -81,33 +82,37 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type here.."
+            placeholder="Enter here.."
             className="textarea"
             rows="3"
           />
-          <button className="send-button" onClick={onSendMessage}>+</button>
+          <button className="send-button" onClick={onSendMessage}>Send</button>
         </div>
       )}
       <div className="messages">
-        {messages.map((msg, index) => (
-          <div key={index} className="message-container" style={{ backgroundColor: color }}>
-            <p className="message-text">
-              {msg.username}: {msg.content}
-            </p>
-            {userEmail ===msg.username &&(
-            <img
-              src="../Asserts/options.png"
-              alt="options"
-              height="20vh"
-              className="options-image"
-              onClick={(event) => handleOptionsClick(event, msg.id)}
-              style={{ cursor: 'pointer', marginTop: '0%' }}
-            />
-          )}
-              <OptionsMenu anchorEl={anchorEl} onClose={handleOptionsClose} onDelete={handleDelete} />
-          </div>
-        ))}
-      </div>
+  {messages.map((msg, index) => (
+    <div key={index} className="message-container" style={{ backgroundColor: color }}>
+      <p className="message-text">{msg.content}</p>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <PersonOutlineOutlinedIcon style={{ marginRight: '1%', width:'7%', marginTop:'2%', color:'white', marginLeft:'54%' }} />
+      <p className="message-username">{msg.username.split('.')[0]}</p>
+    </div>
+
+      {userEmail === msg.username && (
+        <img
+          src="../Asserts/options.png"
+          alt="options"
+          height="20vh"
+          className="options-image"
+          onClick={(event) => handleOptionsClick(event, msg.id)}
+          style={{ cursor: 'pointer', marginTop: '0%' }}
+        />
+      )}
+      <OptionsMenu anchorEl={anchorEl} onClose={handleOptionsClose} onDelete={handleDelete} />
+    </div>
+  ))}
+</div>
+
     </div>
   );
 });
@@ -157,18 +162,18 @@ function ChatRoom() {
   const [dynamicMessages, setDynamicMessages] = useState({});
   const [sectionColors, setSectionColors] = useState({});
   const [addTopicDialogOpen, setAddTopicDialogOpen] = useState(false);
+  const [reloadChat, setReloadChat] = useState(false);
 
   const socketRef = useRef(null);
 
   useEffect(() => {
     if (!socketRef.current) {
-      const socketUrl = `http://10.10.10.93:8085?room=${roomId}&username=${username}`;
+      const socketUrl = `http://10.10.10.116:8085?room=${roomId}&username=${username}`;
       socketRef.current = io(socketUrl, { transports: ['websocket'], upgrade: false });
 
       socketRef.current.on('connect', () => {
         console.log('Socket connected');
       });
-
       socketRef.current.on('receive_message', (data) => {
         console.log('Received message from server:', data);
         switch (data.contentType) {
@@ -191,13 +196,15 @@ function ChatRoom() {
             }));
             break;
         }
+        setReloadChat(prev => !prev);
       });
+      
 
       socketRef.current.on('disconnect', () => {
         console.log('Socket disconnected');
       });
     }
-
+    
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
@@ -206,6 +213,11 @@ function ChatRoom() {
       }
     };
   }, [roomId, username]);
+  useEffect(() => {
+    fetchMessages();
+    fetchTopics();
+  }, [roomId, reloadChat]); 
+  
 
   const fetchRoom = async () => {
     try {
@@ -376,7 +388,7 @@ function ChatRoom() {
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginRight: '2%' }}>
         <Button
-        sx={{ backgroundColor: '#ff0000', color: 'white',fontWeight:'bold',fontSize:'12px', '&:hover': { backgroundColor: '#ff0000' } }}
+        sx={{ backgroundColor: '#bc2525', color: 'white',fontWeight:'bold',fontSize:'12px', '&:hover': { backgroundColor: '#bc2525' } }}
         onClick={() => window.location.href = 'http://localhost:3000'}
         >
           Exit Room <LogoutIcon sx={{width:'18%', marginLeft:'2%'}}/>

@@ -1,3 +1,9 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #F5F5F5;
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -19,10 +25,12 @@
 
 .message-section {
   position: relative;
-  border: 1px solid rgb(255, 255, 255);
+  border: 1.5px solid rgb(206, 204, 204);
+  box-shadow: 0.5px 0.5px rgb(167, 166, 166); 
   padding: 10px;
   margin: 10px;
   overflow: visible; 
+  background-color: white;
 }
 
 .belowheader {
@@ -41,17 +49,18 @@
 
 .title-button {
   width: 100%;
-  padding: 20px;
-  margin-bottom: 10px;
+  padding: 10px;
   border: none;
   cursor: pointer;
-  text-align: left;
-  background: linear-gradient(109.6deg, rgb(36, 45, 57) 11.2%, rgb(16, 37, 60) 51.2%, rgb(0, 0, 0) 98.6%);
-  color: white;
+  text-align: center;
+  background: #ffffff;
+  color: rgb(75, 75, 75);
+  font-size: 15px;
+  font-weight: bold;
 }
 
 .good-message, .title-button.good-message {
-  background: #dc2f2f;
+  background: #7dd87d;
   
 }
 
@@ -71,51 +80,67 @@ button {
   cursor: pointer;
 }
 
-.message-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.message-text {
-  margin-right: 10px;
-  word-wrap: break-word; 
-  width: calc(100% - 30px);
-  margin-left: 5%;
-  color: white;
-}
-
-.options-image {
-  margin-left: -5%;
-}
-
 .input-area {
   display: flex;
-  align-items: center;
-  justify-content: space-between; 
-  margin: 10px;
-  
+  flex-direction: column; 
+  align-items: flex-end;  
+  margin-bottom: 10px;    
 }
 
 .textarea {
-  flex-grow: 1;
-  padding: 5px;
-  resize: none;
-  overflow-wrap: break-word;
-  box-sizing: border-box;
-  height: 40px; 
-
+  width: 90%;            
+  height: 5%;       
+  padding: 10px;          
+  resize: none;          
+  border-radius: 5px;    
+  border: 1px solid #ccc; 
+  margin-bottom: 5px;     
 }
 
 .send-button {
-  padding: 5px 10px;
-  background-color: rgb(22, 138, 22);
-  color: white;
-  margin-left: 5px;
-  border-radius: 20px;
-  background: linear-gradient(110.1deg, rgb(241, 115, 30) 18.9%, rgb(231, 29, 54) 90.7%);
+  padding: 5px 10px;      
+  background-color: #0876f3; 
+  color: white;           
+  border: none;           
+  border-radius: 5px;     
+  cursor: pointer;        
+  font-size: 12px;
 }
 
 body {
   overflow-y: auto; 
+}
+
+.message-container {
+  padding: 10px;               
+  margin-bottom: 5px;          
+  border-radius: 5px;         
+  position: relative;          
+}
+
+.message-text {
+  margin: 0;                   
+  line-height: 1.4;      
+  font-size: 13px;      
+  font-weight: bold;
+  margin-bottom: 1%;
+}
+
+.message-username {
+  margin: 5px 0 0 0;           
+  font-size: 1em;            
+  color: #ffffff;                 
+  text-align: right;         
+  display: block;       
+}
+
+.options-image {
+  position: absolute;        
+  top: 10px;                   
+  right: 10px;                 
+  cursor: pointer;             
+}
+
+.message-container img {
+  margin-top: 5px;             
 }

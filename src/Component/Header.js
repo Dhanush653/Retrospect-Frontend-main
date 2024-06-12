@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState} from 'react';
 import ChatIcon from '../Asserts/chaticon.png';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -10,11 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import Button from '@mui/material/Button';
 import Createroom from './Createroom';
-import ResetPasswordDialog from './ResetPasswordDialog';
-import MyAccountDialog from './MyAccountDialog';
 import { useLocation } from 'react-router-dom';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LockIcon from '@mui/icons-material/Lock';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Keycloak from './Keycloak';
 
@@ -131,8 +127,6 @@ export default function ButtonAppBar() {
           ) : null}
         </Toolbar>
       </AppBar>
-      {/* <MyAccountDialog open={openMyAccountDialog} onClose={handleCloseMyAccountDialog} />
-      <ResetPasswordDialog open={openResetPasswordDialog} onClose={handleCloseResetPasswordDialog} />  */}
     </Box>
   );
 }

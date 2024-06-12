@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, FormControl, RadioGroup, Radio, FormControlLabel } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, FormControl, RadioGroup, Radio, FormControlLabel, IconButton, InputAdornment } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import retro from '../Service/RetrospectService';
 
 const Createroom = ({ open, onClose, roomToUpdate }) => {
@@ -10,6 +11,8 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
     password: '', 
     roomCreatedBy: ''
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const roomCreatedBy = localStorage.getItem('userEmail');
@@ -60,6 +63,10 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{roomToUpdate ? 'Update Room' : 'Create Room'}</DialogTitle>
@@ -95,23 +102,36 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
                 <TextField
                   name="password"
                   label="Set Room Password"
-                  type='password'
+                  type={showPassword ? 'text' : 'password'}
                   value={roomDetails.password}
                   onChange={handleChange}
                   variant="outlined"
                   fullWidth
                   sx={{ marginTop: '10px' }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={togglePasswordVisibility}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
                 />
               )}
             </React.Fragment>
           )}
         </DialogContent>
         <DialogActions>
+        <Button onClick={onClose} variant="outlined" color="primary">
+            Cancel
+          </Button>
           <Button onClick={handleSubmit} variant="contained" color="primary">
             {roomToUpdate ? 'Update' : 'Create'}
-          </Button>
-          <Button onClick={onClose} variant="outlined" color="primary">
-            Cancel
           </Button>
         </DialogActions>
       </form>
