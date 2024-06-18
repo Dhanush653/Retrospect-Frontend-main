@@ -9,7 +9,7 @@ const Createroom = ({ open, onClose, roomToUpdate }) => {
     roomName: '',
     access: 'unrestricted',
     password: '', 
-    roomCreatedBy: ''
+    roomCreatedBy: '' 
   });
 
   const [showPassword, setShowPassword] = useState(false);

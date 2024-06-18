@@ -118,21 +118,6 @@ const MessageSection = memo(({ title, messages, inputValue, onInputChange, onSen
 });
 
 
-function getClassName(contentType) {
-  switch (contentType) {
-    case 'Good':
-      return 'good-message';
-    case 'Bad':
-      return 'bad-message';
-    case 'Pos':
-      return 'pos-message';
-    case 'Blunder':
-      return 'blunder-message';
-    default:
-      return '';
-  }
-}
-
 function getRandomColor() {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -168,7 +153,7 @@ function ChatRoom() {
 
   useEffect(() => {
     if (!socketRef.current) {
-      const socketUrl = `http://10.10.10.116:8085?room=${roomId}&username=${username}`;
+      const socketUrl = `http://192.168.0.178:8085?room=${roomId}&username=${username}`;
       socketRef.current = io(socketUrl, { transports: ['websocket'], upgrade: false });
 
       socketRef.current.on('connect', () => {
