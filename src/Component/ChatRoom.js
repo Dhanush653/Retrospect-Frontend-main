@@ -13,7 +13,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import RetrospectService from '../Service/RetrospectService';
 import Typography from '@mui/material/Typography';
-import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
+import PeopleOutlineIcon from '@mui/icons-material/PersonOutlineOutlined';
 import OptionsMenu from './OptionsMenu';
 import UsernamesDialog from './UsernamesDialog';
 import AddIcon from '@mui/icons-material/Add';
@@ -372,20 +372,16 @@ function ChatRoom() {
         <p className='roomname'>{room.roomName}</p>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginRight: '2%' }}>
-        <Button
-        sx={{ backgroundColor: '#bc2525', color: 'white',fontWeight:'bold',fontSize:'12px', '&:hover': { backgroundColor: '#bc2525' } }}
-        onClick={() => window.location.href = 'http://localhost:3000'}
-        >
-          Exit Room <LogoutIcon sx={{width:'18%', marginLeft:'2%'}}/>
-        </Button>
 
-          <IconButton onClick={handleAddTopicDialogOpen}>
-            <AddIcon sx={{ color: 'black' }} />
-          </IconButton>
-          <IconButton onClick={handleDialogOpen}>
-            <PeopleOutlineIcon sx={{ color: 'black' }} />
-          </IconButton>
-          <InfoOutlinedIcon style={{ cursor: 'pointer' }} onClick={handleClickOpen} />
+          <Button onClick={handleAddTopicDialogOpen} variant='contained' style={{marginRight:'3%' }}>
+            <AddIcon style={{width:'27%', marginRight:'1px'}}/> create 
+          </Button>
+          <Button onClick={handleDialogOpen} variant='contained' style={{marginRight:'3%'}} >
+            <PeopleOutlineIcon style={{width:'23%' , marginRight:'1px'}} /> Members 
+          </Button>
+          <Button onClick={handleClickOpen} variant='contained' style={{marginRight:'3%'}}>
+           <InfoOutlinedIcon style={{width:'30%', marginRight:'3px'}}/> info 
+          </Button>
         </div>
 
         <BootstrapDialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
@@ -409,6 +405,14 @@ function ChatRoom() {
           </DialogContent>
         </BootstrapDialog>
       </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <Button
+        sx={{ backgroundColor: '#bc2525', color: 'white',fontWeight:'bold',fontSize:'12px', '&:hover': { backgroundColor: '#bc2525' }, marginRight:'2.5%', marginBottom:'0.5%', marginTop:'-0.5%' }}
+        onClick={() => window.location.href = 'http://localhost:3000'}
+        >
+          Exit Room <LogoutIcon sx={{width:'18%', marginLeft:'2%'}}/>
+        </Button>
+        </div>
       <div className="container">
         <div className="chat-area">
           <MessageSection
@@ -468,3 +472,5 @@ function ChatRoom() {
 }
 
 export default ChatRoom;
+
+

@@ -39,6 +39,10 @@ html, body {
   justify-content: space-between;
   border-radius: 20px;
 }
+.belowheader .exit-button-wrapper {
+  text-align: right;
+  margin-right: 2%; 
+}
 
 .roomname {
   margin: 2%;
